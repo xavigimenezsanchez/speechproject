@@ -55,9 +55,9 @@
     startRecording.onclick = function() {
         startRecording.disabled = true;
 
-        navigator.getUserMedia({
+        navigator.mediaDevices.getUserMedia({
             audio: true
-        }, function(stream) {
+        }).then(async function(stream) {
                 recordAudio = RecordRTC(stream, {
                 type: 'audio',
                 mimeType: 'audio/webm',
@@ -78,8 +78,7 @@
                 // as soon as the stream is available
                 ondataavailable: function(blob) {
                     console.log(blob.size);
-                    console.log('here');
-                    // 3*-
+                    // 3
                     // making use of socket.io-stream for bi-directional
                     // streaming, create a stream
                     var stream = ss.createStream();
@@ -117,7 +116,7 @@
     socketio.on('results', function (data) {
         console.log(data);
         if(data){
-            resultpreview.innerHTML += "" +  data.results[0].alternatives[0].transcript;
+            resultpreview.innerHTML += "" + data.results[0].alternatives[0].transcript;
         }
     });
     </script>

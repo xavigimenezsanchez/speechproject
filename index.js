@@ -1,17 +1,12 @@
 // ------------- SETTINGS
-const projectId = process.env.npm_config_PROJECT_ID;
 const port = ( process.env.npm_config_PORT || 3000 );
 
 const languageCode = 'en-UK';
 let encoding = 'LINEAR16';
 
-const singleUtterance = true;
 const interimResults = false;
 const sampleRateHertz = 16000;
 
-
-
-console.log(projectId);
 
 // ----------------------
 
@@ -62,8 +57,9 @@ function setupServer() {
 
         ss(client).on('stream-transcribe', function(stream, data) {
             // get the name of the stream
-            console.log(data.size);
+            // console.log(data.size);
             const filename = path.basename(data.name);
+            console.log(filename)
             // pipe the filename to the stream
             stream.pipe(fs.createWriteStream(filename));
             // make a detectIntStream call
@@ -120,7 +116,7 @@ function setupSTT(){
                 console.log(e);
             })
             .on('end', () => {
-                console.log('on end');
+                console.log('he acabat on end');
             });
 
   audio.pipe(recognizeStream);
