@@ -43,68 +43,50 @@
     <script type="text/javascript">
 
     const socketio = io('ws://localhost:3000');
-    const socket = socketio.on('connect', function() {
-        // reset the recorder
-        startRecording.disabled = false;
-    });
-
-    // when the server found results and send
-    // it back to the client
-    const resultpreview = document.getElementById('results');
-    socketio.on('results', function (data) {
-        if(data && data.results[0] && data.results[0].alternatives[0]){
-            resultpreview.innerHTML += " " + data.results[0].alternatives[0].transcript;
-        }
-    });
-
     const startRecording = document.getElementById('start-recording');
     const stopRecording = document.getElementById('stop-recording');
     let recordAudio;
 
-    // on start button handler
+
+    const socket = socketio.on('connect', function() {
+        startRecording.disabled = false;
+    });
+
     startRecording.onclick = function() {
-        // recording started
         startRecording.disabled = true;
 
-        // make use of HTML 5/WebRTC, JavaScript getUserMedia()
-        // to capture the browser microphone stream
         navigator.getUserMedia({
             audio: true
         }, function(stream) {
                 recordAudio = RecordRTC(stream, {
                 type: 'audio',
                 mimeType: 'audio/webm',
-                sampleRate: 44100, // this sampleRate should be the same in your server code
-
-                // MediaStreamRecorder, StereoAudioRecorder, WebAssemblyRecorder
-                // CanvasRecorder, GifRecorder, WhammyRecorder
+                sampleRate: 44100,
+                desiredSampRate: 16000,
+                
                 recorderType: StereoAudioRecorder,
-
-                // Dialogflow / STT requires mono audio
                 numberOfAudioChannels: 1,
 
+
+                //1)
                 // get intervals based blobs
                 // value in milliseconds
                 // as you might not want to make detect calls every seconds
                 timeSlice: 4000,
 
-                // only for audio track
-                // audioBitsPerSecond: 128000,
-
-                // used by StereoAudioRecorder
-                // the range 22050 to 96000.
-                // let us force 16khz recording:
-                desiredSampRate: 16000,
-
+                //2)
                 // as soon as the stream is available
                 ondataavailable: function(blob) {
+                    console.log(blob.size);
+                    console.log('here');
+                    // 3
                     // making use of socket.io-stream for bi-directional
                     // streaming, create a stream
                     var stream = ss.createStream();
                     // stream directly to server
                     // it will be temp. stored locally
                     ss(socket).emit('stream-transcribe', stream, {
-                        name: 'patata.wav', 
+                        name: 'stream.wav', 
                         size: blob.size
                     });
                     // pipe the audio blob to the read stream
@@ -119,13 +101,25 @@
         });
     };
 
+    // 4)
     // on stop button handler
     stopRecording.onclick = function() {
         // recording stopped
+        recordAudio.stopRecording();
         startRecording.disabled = false;
         stopRecording.disabled = true;
-        recordAudio.stopRecording();
     };
+
+    const resultpreview = document.getElementById('results');
+    const intentInput = document.getElementById('intent');
+    const textInput = document.getElementById('queryText');
+    
+    socketio.on('results', function (data) {
+        console.log(data);
+        if(data){
+            resultpreview.innerHTML += "" + data.textTranslationResult.translation;
+        }
+    });
     </script>
 
 </body>
