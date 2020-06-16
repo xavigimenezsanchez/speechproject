@@ -1,35 +1,16 @@
 // ------------- SETTINGS
 const projectId = process.env.npm_config_PROJECT_ID;
-const example = 5 ;//  process.env.npm_config_EXAMPLE;
 const port = ( process.env.npm_config_PORT || 3000 );
 
 const languageCode = 'en-UK';
 let encoding = 'AUDIO_ENCODING_LINEAR_16';
-if(example > 3){
-  // NOTE: ENCODING NAMING FOR SPEECH API IS DIFFERENT
-  encoding = 'LINEAR16';
-}
-
-console.log(example);
-if(example == 7){
-  // NOTE: ENCODING NAMING FOR SPEECH API IS DIFFERENT
-  encoding = 'linear16';
-}
 
 const singleUtterance = true;
 const interimResults = false;
 const sampleRateHertz = 16000;
-const speechContexts = [
-  {
-    phrases: [
-      'mail',
-      'email'
-    ],
-    boost: 20.0
-  }
-]
 
-console.log(example);
+
+
 console.log(projectId);
 
 // ----------------------
@@ -48,7 +29,6 @@ const uuid = require('uuid');
 const util = require('util');
 const { Transform, pipeline } = require('stream');
 const pump = util.promisify(pipeline);
-//const df = require('dialogflow').v2beta1;
 
 // set some server variables
 const app = express();
@@ -56,14 +36,9 @@ var server;
 var sessionId, sessionClient, sessionPath, request;
 var speechClient, requestSTT, ttsClient, requestTTS, mediaTranslationClient, requestMedia;
 
-// STT demo
+
 const speech = require('@google-cloud/speech');
 
-// TTS demo
-//const textToSpeech = require('@google-cloud/text-to-speech');
-
-// Media Translation Demo
-//const mediatranslation = require('@google-cloud/media-translation');
 
 /**
  * Setup Express Server with CORS and SocketIO
@@ -443,8 +418,6 @@ async function textToAudioBuffer(text) {
   return response[0].audioContent;
 }
 
-//setupDialogflow();
+
 setupSTT();
-//setupTTS();
-//mediaTranslation();
 setupServer();
